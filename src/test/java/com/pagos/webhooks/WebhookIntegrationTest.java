@@ -89,6 +89,20 @@ class WebhookIntegrationTest {
     }
 
     @Test
+    void elMontoConsolidadoEsElDelEventoQueAvanza() throws Exception {
+        UUID pago = UUID.randomUUID();
+        enviar(evento(UUID.randomUUID(), pago, "AUTHORIZED", "2026-11-23T10:00:00Z"), "APPLIED");
+        enviar("""
+                {"event_id":"%s","payment_id":"%s","status":"CAPTURED",
+                 "amount":1400.00,"currency":"ARS","timestamp":"2026-11-23T10:01:00Z"}
+                """.formatted(UUID.randomUUID(), pago), "APPLIED");
+
+        mvc.perform(get("/payments/" + pago))
+                .andExpect(jsonPath("$.payment.amount").value(1400.00))
+                .andExpect(jsonPath("$.history[0].amount").value(1500.00));
+    }
+
+    @Test
     void unPayloadInvalidoDevuelve400() throws Exception {
         mvc.perform(post("/webhooks/paygate").contentType(MediaType.APPLICATION_JSON)
                         .content("{\"event_id\":\"no-es-uuid\"}"))
