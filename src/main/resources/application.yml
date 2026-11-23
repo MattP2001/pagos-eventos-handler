@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/pagos}
+    username: ${DB_USER:pagos}
+    password: ${DB_PASSWORD:pagos}
+  flyway:
+    enabled: true
+server:
+  port: 8080
