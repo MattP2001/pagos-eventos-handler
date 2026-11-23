@@ -30,3 +30,8 @@
 ## Pendiente de confirmar
 
 - Si `REFUNDED` sólo es válido después de `CAPTURED`.
+
+## Alcance
+
+- El servicio sólo recibe, persiste de forma consistente y expone la consulta.
+- No tiene que avisarle a ningún otro sistema (no hay downstream para acreditar).
