@@ -55,11 +55,17 @@ public class PaymentRepository {
         return rows.stream().findFirst();
     }
 
-    public void insert(Payment p) {
-        jdbc.update("""
+    /**
+     * Crea el pago si no existe. Devuelve true si lo creó. Con ON CONFLICT DO NOTHING, dos
+     * eventos simultáneos del mismo pago nuevo no fallan: uno lo crea y el otro espera y sigue.
+     */
+    public boolean insertIfAbsent(Payment p) {
+        int rows = jdbc.update("""
                 INSERT INTO payment (payment_id, status, amount, currency, last_event_at)
                 VALUES (?, ?, ?, ?, ?)
+                ON CONFLICT (payment_id) DO NOTHING
                 """, p.paymentId(), p.status().name(), p.amount(), p.currency(), p.lastEventAt());
+        return rows == 1;
     }
 
     public void applyEvent(UUID paymentId, PaymentStatus status, BigDecimal amount, String currency,

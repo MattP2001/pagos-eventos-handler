@@ -5,7 +5,6 @@ import com.pagos.webhooks.domain.StateMachine;
 import com.pagos.webhooks.repository.PaymentEventRepository;
 import com.pagos.webhooks.repository.PaymentRepository;
 import com.pagos.webhooks.repository.PaymentRepository.Payment;
-import java.util.Optional;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,13 +33,13 @@ public class WebhookService {
             return WebhookResult.DUPLICATE;
         }
 
-        Optional<Payment> current = payments.findForUpdate(event.paymentId());
+        boolean created = payments.insertIfAbsent(new Payment(event.paymentId(), event.status(),
+                event.amount(), event.currency(), event.timestamp()));
         boolean applied;
-        if (current.isEmpty()) {
-            payments.insert(new Payment(event.paymentId(), event.status(), event.amount(),
-                    event.currency(), event.timestamp()));
+        if (created) {
             applied = true;
-        } else if (StateMachine.advances(current.get().status(), event.status())) {
+        } else if (StateMachine.advances(
+                payments.findForUpdate(event.paymentId()).orElseThrow().status(), event.status())) {
             // El monto consolidado es el del evento que hace avanzar el estado (ver README).
             payments.applyEvent(event.paymentId(), event.status(), event.amount(), event.currency(),
                     event.timestamp());
