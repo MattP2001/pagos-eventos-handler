@@ -27,11 +27,15 @@
   `CAPTURED`) no degrada ni pisa el estado actual: el estado se queda en el más avanzado.
 - El evento rezagado igual se guarda en el historial del pago.
 
-## Pendiente de confirmar
-
-- Si `REFUNDED` sólo es válido después de `CAPTURED`.
-
 ## Alcance
 
 - El servicio sólo recibe, persiste de forma consistente y expone la consulta.
 - No tiene que avisarle a ningún otro sistema (no hay downstream para acreditar).
+- Sin convenciones de ramas ni commits para este ejercicio. Lo importante: repo público,
+  migraciones y un README que explique cómo levantarlo y cómo correr los tests.
+
+## Dudas abiertas (para chequear con PayGate)
+
+- ¿Puede llegar un `REFUNDED` sin un `CAPTURED` previo? Hoy se aplica.
+- ¿Pueden variar los montos entre estados de un mismo pago? Hoy el monto consolidado es el del
+  evento que avanza el estado.
