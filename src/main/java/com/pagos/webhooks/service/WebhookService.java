@@ -41,7 +41,9 @@ public class WebhookService {
                     event.currency(), event.timestamp()));
             applied = true;
         } else if (StateMachine.advances(current.get().status(), event.status())) {
-            payments.updateStatus(event.paymentId(), event.status(), event.timestamp());
+            // El monto consolidado es el del evento que hace avanzar el estado (ver README).
+            payments.applyEvent(event.paymentId(), event.status(), event.amount(), event.currency(),
+                    event.timestamp());
             applied = true;
         } else {
             applied = false;

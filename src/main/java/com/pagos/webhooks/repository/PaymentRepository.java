@@ -62,12 +62,14 @@ public class PaymentRepository {
                 """, p.paymentId(), p.status().name(), p.amount(), p.currency(), p.lastEventAt());
     }
 
-    public void updateStatus(UUID paymentId, PaymentStatus status, OffsetDateTime lastEventAt) {
+    public void applyEvent(UUID paymentId, PaymentStatus status, BigDecimal amount, String currency,
+            OffsetDateTime lastEventAt) {
         jdbc.update("""
                 UPDATE payment
-                   SET status = ?, last_event_at = ?, updated_at = CURRENT_TIMESTAMP
+                   SET status = ?, amount = ?, currency = ?, last_event_at = ?,
+                       updated_at = CURRENT_TIMESTAMP
                  WHERE payment_id = ?
-                """, status.name(), lastEventAt, paymentId);
+                """, status.name(), amount, currency, lastEventAt, paymentId);
     }
 
     public record Payment(
