@@ -1,0 +1,20 @@
+### Evento nuevo
+POST http://localhost:8080/webhooks/paygate
+Content-Type: application/json
+
+{"event_id":"7c0e3b2a-5a2f-4f61-9a3e-0d6c1e2b9f10","payment_id":"b1f7a8d4-2c9e-4c1b-8d1f-3e5a7b9c0d12","status":"CAPTURED","amount":1500.00,"currency":"ARS","timestamp":"2026-11-23T14:30:00Z"}
+
+### Reintento del mismo evento: responde DUPLICATE
+POST http://localhost:8080/webhooks/paygate
+Content-Type: application/json
+
+{"event_id":"7c0e3b2a-5a2f-4f61-9a3e-0d6c1e2b9f10","payment_id":"b1f7a8d4-2c9e-4c1b-8d1f-3e5a7b9c0d12","status":"CAPTURED","amount":1500.00,"currency":"ARS","timestamp":"2026-11-23T14:30:00Z"}
+
+### Evento rezagado: responde RECORDED_ONLY y no pisa el CAPTURED
+POST http://localhost:8080/webhooks/paygate
+Content-Type: application/json
+
+{"event_id":"0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d","payment_id":"b1f7a8d4-2c9e-4c1b-8d1f-3e5a7b9c0d12","status":"AUTHORIZED","amount":1500.00,"currency":"ARS","timestamp":"2026-11-23T14:29:00Z"}
+
+### Estado e historial
+GET http://localhost:8080/payments/b1f7a8d4-2c9e-4c1b-8d1f-3e5a7b9c0d12
